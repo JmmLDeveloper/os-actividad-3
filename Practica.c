@@ -28,14 +28,8 @@ s
 #include <semaphore.h>
 #include <time.h>
 
-
 pthread_mutex_t read_lock;
 pthread_mutex_t write_lock;
-
-sem_t A,B;
-char * cadena = "bbb";
-int flag=0;
-char aux[33];
 
 int generate_password(int idx,char* password){
     char* letras ="\0abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -52,35 +46,6 @@ int generate_password(int idx,char* password){
     return 1;
 }
 
-void *consumidor(void *nada){
-    do{
-        sem_wait(&B);
-        unsigned char md5_result[EVP_MAX_MD_SIZE];
-        unsigned int md5_length;
-        EVP_MD_CTX *mdctx;
-        mdctx = EVP_MD_CTX_new();
-        EVP_DigestInit(mdctx, EVP_md5());
-        EVP_DigestUpdate(mdctx, cadena, strlen(cadena));
-        EVP_DigestFinal(mdctx, md5_result, &md5_length);
-        EVP_MD_CTX_free(mdctx);
-        int i;
-        //array que nos servirá para diferenciar
-        char converted[md5_length*2 + 1];
-        for(i=0;i<md5_length;i++) {
-            sprintf(&converted[i*2], "%02x", md5_result[i]);
-        }
-        //diferenciar 
-        //Diferencio si es verdad
-        if(strcmp(converted,aux)==0){
-            flag=1;
-            printf("la contraseña es: %s\n",cadena);
-        }
-        sem_post(&A);
-    }while(flag!=1);
-    printf("termino el thread consumidor\n");
-
-    pthread_exit(NULL);
-}
 
 int process_line(FILE* input,char* name,char* hash) {
     char line[96];
@@ -123,10 +88,8 @@ void md5(char* digest,char* input) {
     strncpy(digest,result_str,33);
 }
  
-
 FILE* inputfile;
 FILE* tempfile;
-
 
 int lookup(FILE* input,char* key,char* value,int value_length) {
   char name[64];
@@ -177,7 +140,7 @@ void organize_output() {
 	}
     }
 }
-
+int cracked_passwords_counter = 0;
 void* worker(void* args) {
     char name[64];
     char hash[33];
@@ -196,7 +159,7 @@ void* worker(void* args) {
 
 	for(int i =0 ; generate_password(i,password) ; i++) {
 	  md5(digest,password);
-	  //printf("%s %s\n",password,digest);
+	    
 	  if( strcmp(digest,hash) == 0 ) {
 	      strcpy(correct_password,password);
 	      break;
@@ -207,9 +170,11 @@ void* worker(void* args) {
 	    printf("no fue posible cracker la contraseña para %s\n", name);
 
 	} else {
-	  pthread_mutex_lock(&read_lock);		
+	  pthread_mutex_lock(&write_lock);		
+	    cracked_passwords_counter++;
+	    printf("el programa ha crackeado %d contraseñas\n",cracked_passwords_counter);
 	    fprintf(tempfile,"%s::%s\n",name,correct_password);
-	  pthread_mutex_unlock(&read_lock);		
+	  pthread_mutex_unlock(&write_lock);		
 	}
 
     }
@@ -222,18 +187,15 @@ int read_num() {
 }
 
 
+
 int main(int argc, char *argv[]) {
-
-
-
-
     pthread_t* threads;
     FILE *input = fopen(argv[1], "r");  
     tempfile = fopen("tempfile.txt", "w");  
     inputfile = input;
-    printf("ingrese numero de threads a usar (max 6): ");
-    int thread_num = read_num(); // falta validar que este entre 1 y 6
+    int thread_num = atoll(argv[2]); // falta validar 
     threads = malloc( sizeof(pthread_t) * thread_num );
+    printf("el programa comenzara a creacker contraseñas, usando %d hilos\n",thread_num);
 
     for(int i = 0; i < thread_num; i++) {
         pthread_create(&threads[i], NULL, worker, NULL);

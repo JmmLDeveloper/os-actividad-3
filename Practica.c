@@ -134,7 +134,7 @@ void organize_output() {
 	  return;
 	}
 	if( lookup(tempfile,name,password,5)  ) {
-	  fprintf(salida,"%s:%s\n",name,password);  
+	  fprintf(salida,"%s \t %s\n",name,password);  
 	} else {
 	  printf( "errocito de bolistio");
 	}

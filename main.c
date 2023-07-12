@@ -11,12 +11,13 @@ Instrucciones de compilacion
 
   WINDOWS:
     se debe utilizar alguna herramienta que linken las librerias de win32 api
-    como visual studio, en este caso se utilizo MinGW  y el comando de compilacion 
-    fue el siguiente
+    como visual studio, en este caso se utilizo MinGW  y el comando de
+compilacion fue el siguiente
 
     gcc main.c utils.c -o programa.exe
   Linux:
-    Para la compilacion en linux se deben descargar algunas librerias de criptografia con
+    Para la compilacion en linux se deben descargar algunas librerias de
+criptografia con
 
     apt-get install libssl-dev
 
@@ -26,7 +27,6 @@ Instrucciones de compilacion
     gcc -o programa main.c utils.c -lssl -lcrypto -pthread
 
 */
-
 
 #include <stdio.h>
 #include <string.h>
@@ -40,14 +40,18 @@ int process_line(FILE *input, char *name, char *hash);
 void organize_output(void);
 void worker(void);
 
-
 int main(int argc, char *argv[]) {
+  if (argc < 3) {
+    printf("Error: Please provide at least two arguments.\n");
+    return 1;
+  }
+
   Thread *threads;
   inputfile = fopen(argv[1], "r");
   tempfile = fopen("tempfile.txt", "w");
   char hash[33];
 
-  int thread_num = atoll(argv[2]);  // falta validar
+  int thread_num = atoll(argv[2]);
   threads = malloc(sizeof(Thread) * thread_num);
   printf("el programa comenzara a creacker contraseñas, usando %d hilos\n",
          thread_num);
@@ -55,8 +59,6 @@ int main(int argc, char *argv[]) {
   setup_thread_func(worker);
   create_mutex(&write_mutex);
   create_mutex(&read_mutex);
-
-
 
   for (int i = 0; i < thread_num; i++) {
     start_thread(&threads[i]);

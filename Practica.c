@@ -144,9 +144,31 @@ void organize_output()
   {
     process_line_result = process_line(input, name, hash);
 
+<<<<<<< HEAD
     if (process_line_result == 0)
     {
       return;
+=======
+    tempfile = fopen("tempfile.txt", "r");  
+    FILE *salida = fopen("salida.txt", "w");  
+    FILE *input = fopen("entrada.txt", "r");  
+
+    char name[64];
+    char hash[33];
+    char password[5];
+    int process_line_result;
+    while ( input != NULL && salida != NULL && tempfile != NULL ) {
+	process_line_result = process_line(input,name,hash); 
+
+	if ( process_line_result == 0 ) {
+	  return;
+	}
+	if( lookup(tempfile,name,password,5)  ) {
+	  fprintf(salida,"%s \t %s\n",name,password);  
+	} else {
+	  printf( "errocito de bolistio");
+	}
+>>>>>>> 9da9c1894f7ad7ae90beeb29c3150e0b8a5c7234
     }
     if (lookup(tempfile, name, password, 5))
     {

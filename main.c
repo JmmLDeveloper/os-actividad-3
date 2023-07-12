@@ -1,3 +1,33 @@
+/*
+Andrés Díaz V-28.285.435
+Jose Marquez V-27.675.746
+
+Para el correcto funcionamiento del programa se deben pasar los argumentos
+de threads y de archivo de entrada de la siguiente manera
+    ./programa entrada.txt 6
+
+Instrucciones de compilacion
+  El programa consta de main.c , utils.c y utils.h
+
+  WINDOWS:
+    se debe utilizar alguna herramienta que linken las librerias de win32 api
+    como visual studio, en este caso se utilizo MinGW  y el comando de compilacion 
+    fue el siguiente
+
+    gcc main.c utils.c -o programa.exe
+  Linux:
+    Para la compilacion en linux se deben descargar algunas librerias de criptografia con
+
+    apt-get install libssl-dev
+
+    En linux se utilizo el compilador  GNU gcc y el comando de compilacion
+    fue el siguiente
+
+    gcc -o programa main.c utils.c -lssl -lcrypto -pthread
+
+*/
+
+
 #include <stdio.h>
 #include <string.h>
 
@@ -68,7 +98,7 @@ int process_line(FILE *input, char *name, char *hash) {
 }
 
 int generate_password(int idx, char *password) {
-  char *letras = "\0abcdef";
+  char *letras = "\0abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
   int len = strlen(letras + 1) +
             1;  // this skips the end of string char but still counts it
   if (idx >= len * len * len * len) {
@@ -135,7 +165,7 @@ void worker(void) {
       printf("no fue posible cracker la contraseña para %s\n", name);
     } else {
       lock_mutex(&write_mutex);
-      printf("el programa ha crackeado una contraseñas\n");
+      printf("el programa ha crackeado una de las contraseñas\n");
       fprintf(tempfile, "%s::%s\n", name, correct_password);
       unlock_mutex(&write_mutex);
     }
@@ -160,7 +190,7 @@ void organize_output(void) {
     if (lookup(tempfile, name, password, 5)) {
       fprintf(salida, "%s:%s\n", name, password);
     } else {
-      printf("errocito de bolistio");
+      printf("error al organizar el archivo");
     }
   }
 }

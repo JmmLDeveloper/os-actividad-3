@@ -42,12 +42,17 @@ void worker(void);
 
 int main(int argc, char *argv[]) {
   if (argc < 3) {
-    printf("Error: Please provide at least two arguments.\n");
+    printf("Error: se nececitan 2 argumentos (archivo entrada y hilos).\n");
     return 1;
   }
 
   Thread *threads;
   inputfile = fopen(argv[1], "r");
+
+  if (inputfile == NULL) {
+    printf("El archivo de entrada no existe.\n");
+  }
+
   tempfile = fopen("tempfile.txt", "w");
   char hash[33];
 

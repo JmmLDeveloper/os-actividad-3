@@ -6,6 +6,13 @@ void md5(char *digest, char *input);
 
 void setup_thread_func(void (*callback)(void)) { _worker = callback; }
 
+Mutex read_mutex;
+Mutex write_mutex;
+
+FILE *inputfile;
+FILE *tempfile;
+FILE *ouputfile;
+
 #ifdef _WIN32
 
     void md5(char *digest, char *input) {
@@ -103,12 +110,12 @@ void setup_thread_func(void (*callback)(void)) { _worker = callback; }
   }
 
   void join_thread(Thread *thread) {
-    pthread_join(&(thread->_thread), NULL);
+    pthread_join(thread->_thread, NULL);
   }
 
   void create_mutex(Mutex *mutex) {
-    pthread_mutex_init(mutex->_mutex,NUll);
+    pthread_mutex_init(&(mutex->_mutex),NULL);
   }
-  void lock_mutex(Mutex *mutex) { pthread_mutex_lock(mutex->_mutex); }
-  void unlock_mutex(Mutex *mutex) { pthread_mutex_unlock(mutex->_mutex); }
+  void lock_mutex(Mutex *mutex) { pthread_mutex_lock(&(mutex->_mutex)); }
+  void unlock_mutex(Mutex *mutex) { pthread_mutex_unlock(&(mutex->_mutex)); }
 #endif

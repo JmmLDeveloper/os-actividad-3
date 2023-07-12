@@ -39,14 +39,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Mutex read_mutex;
-Mutex write_mutex;
+extern Mutex read_mutex;
+extern Mutex write_mutex;
 
 
 
-FILE *inputfile;
-FILE *tempfile;
-FILE *ouputfile;
+extern FILE *inputfile;
+extern FILE *tempfile;
+extern FILE *ouputfile;
 
 void setup_thread_func(void (*callback)(void));
 void start_thread(Thread* thread);
